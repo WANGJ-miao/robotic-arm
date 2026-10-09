@@ -37,7 +37,8 @@ if __name__ == "__main__":
             vs.draw_effort_with_joint12_fixed(angle1, angle2)
             success = True
         elif (choice == "5"):
-            vs.draw_self_lock_position_with_margin()
+            Fc = float(input("输入最大静摩擦力: (单位: N) \n"))
+            vs.draw_self_lock_position_with_margin(Fc)
             success = True
         else:
             print("please type the right task name")

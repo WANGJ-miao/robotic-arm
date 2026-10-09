@@ -131,8 +131,8 @@ def draw_self_lock_position(Fc:float=7):
         np.rad2deg(lock_theta3),
     )
     ax[0, 0].set_xlabel(r"$\theta_1$ (deg)")
-    ax[0, 0].set_xlabel(r"$\theta_2$ (deg)")
-    ax[0, 0].set_xlabel(r"$\theta_3$ (deg)")
+    ax[0, 0].set_ylabel(r"$\theta_2$ (deg)")
+    ax[0, 0].set_zlabel(r"$\theta_3$ (deg)")
     ax[0, 0].set_title("Self-locking space")
     plt.show()
 
@@ -166,8 +166,8 @@ def draw_self_lock_position_with_margin(Fc:float=7):
         alpha = 0.2
     )
     ax[0, 0].set_xlabel(r"$\theta_1$ (deg)")
-    ax[0, 0].set_xlabel(r"$\theta_2$ (deg)")
-    ax[0, 0].set_xlabel(r"$\theta_3$ (deg)")
+    ax[0, 0].set_ylabel(r"$\theta_2$ (deg)")
+    ax[0, 0].set_zlabel(r"$\theta_3$ (deg)")
     ax[0, 0].set_title("Self-locking space")
     plt.show()
 
