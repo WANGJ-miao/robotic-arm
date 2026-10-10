@@ -33,16 +33,19 @@ python task1.py
 
 ### 结果与分析
 固定12电机角度, 三个关节力矩
+
 ![力矩图](./assets/torque-with-motor12-fixed.png)
 
 固定13电机角度, 三个关节力矩
+
 ![力矩图](./assets/torque-with-motor13-fixed.png)
 
 固定23电机角度, 三个关节力矩
+
 ![力矩图](./assets/torque-with-motor23-fixed.png)
 
 以上说明转动任一关节, 都会对三个电机同时产生影响
 
-能发生自锁情况时三个关节角度的空间图
-黄色处摩擦力冗余较大, 紫色处摩擦力冗余小. 无颜色处无法实现自锁
+能发生自锁情况时三个关节角度的空间图, 黄色处摩擦力冗余较大, 紫色处摩擦力冗余小. 无颜色处无法实现自锁
+
 ![自锁空间图](./assets/self-lock.png)
