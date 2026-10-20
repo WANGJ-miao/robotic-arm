@@ -120,14 +120,23 @@ def fric_cv(q_dot, b, Fc):
     return (fric_v(q_dot, b) + fric_c(q_dot, Fc)).astype(float)
 
 def consider_f(M, q_dot, b, Fc):
-    # align the shape of Fc to M.shape
+    """返回电机力矩；静止时取绝对值最小的保持力矩。
+
+    fs 始终表示作用于机械臂的实际摩擦力矩。
+    """
+    M = np.asarray(M, dtype=float)
+    q_dot = np.broadcast_to(np.asarray(q_dot, dtype=float), M.shape)
     Fc = np.broadcast_to(Fc, M.shape)
+    if np.any(~np.isfinite(Fc)) or np.any(Fc < 0):
+        raise ValueError("最大摩擦力矩必须为有限非负数")
+    if np.any(~np.isfinite(b)) or np.any(np.asarray(b) < 0):
+        raise ValueError("黏性摩擦系数必须为有限非负数")
     fs = fric_cv(q_dot, b, Fc)
     for i, _ in enumerate(fs):
         if np.isclose(q_dot[i], 0): # 如果角速度是0, 静态分析, f会尽量让M变小
-            f = -np.sign(M[i]) * np.minimum(Fc[i], np.abs(M[i]))
+            f = np.sign(M[i]) * np.minimum(Fc[i], np.abs(M[i]))
             fs[i] = f
-    return M + fs
+    return M - fs
 
 # if __name__ == "__main__":
     # test

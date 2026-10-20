@@ -1,9 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 from model import static
 
-def draw_effort_with_joint23_fixed(theta2: float=0, theta3: float=0):
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+ASSETS_DIR = PROJECT_ROOT / "assets"
+
+def draw_effort_with_joint23_fixed(theta2: float=0, theta3: float=0, **parameters):
     """ 
     固定关节23, 绘制随着关节1变化, 三个关节的力矩大小
     单位rad
@@ -15,9 +19,9 @@ def draw_effort_with_joint23_fixed(theta2: float=0, theta3: float=0):
 
     for theta1 in theta1_array:
         q = np.array([theta1, theta2, theta3])
-        tau_raw = static.static_torque(q)
+        tau_raw = static.static_torque(q, **parameters)
         q_dot = np.zeros(3)
-        tau_with_fric = static.static_torque_with_f(q, q_dot, b=0, Fc=2)
+        tau_with_fric = static.static_torque_with_f(q, q_dot, b=0, Fc=2, **parameters)
         tau_raw_history.append(tau_raw)
         tau_with_fric_history.append(tau_with_fric)
 
@@ -38,7 +42,7 @@ def draw_effort_with_joint23_fixed(theta2: float=0, theta3: float=0):
         ax[0, i].grid()
     plt.show()
 
-def draw_effort_with_joint13_fixed(theta1: float=0, theta3: float=0):
+def draw_effort_with_joint13_fixed(theta1: float=0, theta3: float=0, **parameters):
     """ 
     固定关节13, 绘制随着关节2变化, 三个关节的力矩大小
     单位rad
@@ -50,9 +54,9 @@ def draw_effort_with_joint13_fixed(theta1: float=0, theta3: float=0):
 
     for theta2 in theta2_array:
         q = np.array([theta1, theta2, theta3])
-        tau_raw = static.static_torque(q)
+        tau_raw = static.static_torque(q, **parameters)
         q_dot = np.zeros(3)
-        tau_with_fric = static.static_torque_with_f(q, q_dot, b=0, Fc=2)
+        tau_with_fric = static.static_torque_with_f(q, q_dot, b=0, Fc=2, **parameters)
         tau_raw_history.append(tau_raw)
         tau_with_fric_history.append(tau_with_fric)
 
@@ -73,7 +77,7 @@ def draw_effort_with_joint13_fixed(theta1: float=0, theta3: float=0):
         ax[0, i].grid()
     plt.show()
 
-def draw_effort_with_joint12_fixed(theta1: float=0, theta2: float=0):
+def draw_effort_with_joint12_fixed(theta1: float=0, theta2: float=0, **parameters):
     """ 
     固定关节12, 绘制随着关节3变化, 三个关节的力矩大小
     单位rad
@@ -85,9 +89,9 @@ def draw_effort_with_joint12_fixed(theta1: float=0, theta2: float=0):
 
     for theta3 in theta3_array:
         q = np.array([theta1, theta2, theta3])
-        tau_raw = static.static_torque(q)
+        tau_raw = static.static_torque(q, **parameters)
         q_dot = np.zeros(3)
-        tau_with_fric = static.static_torque_with_f(q, q_dot, b=0, Fc=2)
+        tau_with_fric = static.static_torque_with_f(q, q_dot, b=0, Fc=2, **parameters)
         tau_raw_history.append(tau_raw)
         tau_with_fric_history.append(tau_with_fric)
 
@@ -108,7 +112,7 @@ def draw_effort_with_joint12_fixed(theta1: float=0, theta2: float=0):
         ax[0, i].grid()
     plt.show()
 
-def draw_self_lock_position(Fc:float=7):
+def draw_self_lock_position(Fc:float=7, **parameters):
     N = 40
     theta1_array = np.linspace(-np.pi, np.pi, N)
     theta2_array = np.linspace(-np.pi, np.pi, N)
@@ -120,7 +124,7 @@ def draw_self_lock_position(Fc:float=7):
         for theta2 in theta2_array:
             for theta3 in theta3_array:
                 q = np.array([theta1, theta2, theta3])
-                if static.is_self_lock(q, Fc):
+                if static.is_self_lock(q, Fc, **parameters):
                     lock_theta1.append(theta1)
                     lock_theta2.append(theta2)
                     lock_theta3.append(theta3)
@@ -136,7 +140,10 @@ def draw_self_lock_position(Fc:float=7):
     ax[0, 0].set_title("Self-locking space")
     plt.show()
 
-def draw_self_lock_position_with_margin(Fc:float=7):
+def draw_self_lock_position_with_margin(Fc:float=7, **parameters):
+    """
+    Fc 为各关节最大静摩擦力矩，单位 N·m。
+    """
     N = 40
     theta1_array = np.linspace(-np.pi, np.pi, N)
     theta2_array = np.linspace(-np.pi, np.pi, N)
@@ -149,26 +156,32 @@ def draw_self_lock_position_with_margin(Fc:float=7):
         for theta2 in theta2_array:
             for theta3 in theta3_array:
                 q = np.array([theta1, theta2, theta3])
-                M = static.static_torque_with_f(q, np.zeros(3), 0, Fc)
-                margin = np.min(Fc - np.abs(M))
+                margin = static.static_friction_margin(q, Fc, **parameters)
                 if margin >= 0:
                     lock_theta1.append(theta1)
                     lock_theta2.append(theta2)
                     lock_theta3.append(theta3)
                     lock_margin.append(margin)
     fig, ax = plt.subplots(squeeze=False, subplot_kw={"projection": "3d"})
-    ax[0, 0].scatter(
+    scatter = ax[0, 0].scatter(
         np.rad2deg(lock_theta1),
         np.rad2deg(lock_theta2),
         np.rad2deg(lock_theta3),
         c = lock_margin,
         s = 5,
-        alpha = 0.2
+        alpha = 0.8,
+        vmin = 0,
+        vmax = Fc
     )
     ax[0, 0].set_xlabel(r"$\theta_1$ (deg)")
     ax[0, 0].set_ylabel(r"$\theta_2$ (deg)")
     ax[0, 0].set_zlabel(r"$\theta_3$ (deg)")
     ax[0, 0].set_title("Self-locking space")
+    fig.colorbar(scatter, ax=ax, shrink=0.65, pad=0.12,
+                 label="Minimum static friction margin (N m)")
+    ax[0, 0].set_title(f"Self-locking space (Fc = {Fc:g} N m)")
+    ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+    fig.savefig(ASSETS_DIR / f"self-lock-{Fc:g}Nm.png", dpi=180)
     plt.show()
 
 if __name__ == "__main__":
