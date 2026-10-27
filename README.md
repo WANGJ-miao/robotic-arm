@@ -101,10 +101,21 @@ $$
 
 用二维旋转矩阵和转过正 90° 的算子表示平面叉积：
 
-$$
-R(\varphi)=\begin{bmatrix}\cos\varphi&-\sin\varphi\\\sin\varphi&\cos\varphi\end{bmatrix},\qquad
-J=\begin{bmatrix}0&-1\\1&0\end{bmatrix},\qquad J^2=-I.
-$$
+<!-- 不知到为什么， github会把行内公式里面的\\转义成\本身， 所以就直接勇math包起来了 -->
+
+``` math
+R(\varphi)=\begin{bmatrix}
+\cos\varphi&-\sin\varphi\\
+\sin\varphi&\cos\varphi
+\end{bmatrix},
+\qquad
+J=
+\begin{bmatrix}
+0&-1\\
+1&0
+\end{bmatrix},
+\qquad J^2=-I.
+```
 
 动点在局部系中的位置、相对速度、相对加速度记为 $\boldsymbol\rho,\dot{\boldsymbol\rho},\ddot{\boldsymbol\rho}$，父系中局部系原点为 $\mathbf O$。令 $\omega=\dot\varphi$、$\alpha=\ddot\varphi$，有 $\dot R=\omega JR$。父系中的点位置为：
 
